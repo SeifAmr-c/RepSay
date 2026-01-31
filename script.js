@@ -79,6 +79,25 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
+    const successModal = document.getElementById('successModal');
+    const modalOkBtn = document.getElementById('modalOkBtn');
+
+    // Modal OK button - close modal and scroll to top
+    if (modalOkBtn && successModal) {
+        modalOkBtn.addEventListener('click', () => {
+            successModal.classList.remove('active');
+            // Scroll to top of page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Also close modal when clicking overlay background
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.remove('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
 
     if (contactForm && submitBtn) {
         contactForm.addEventListener('submit', async (e) => {
@@ -117,18 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    // Success
+                    // Success - show modal
                     submitBtn.classList.remove('loading');
-                    submitBtn.classList.add('success');
+                    submitBtn.disabled = false;
 
                     // Reset form
                     contactForm.reset();
 
-                    // Reset button after 3 seconds
-                    setTimeout(() => {
-                        submitBtn.classList.remove('success');
-                        submitBtn.disabled = false;
-                    }, 3000);
+                    // Show success modal
+                    if (successModal) {
+                        successModal.classList.add('active');
+                    }
                 } else {
                     throw new Error('Failed to send message');
                 }
