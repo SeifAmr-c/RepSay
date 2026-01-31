@@ -668,6 +668,7 @@ img {
     cursor: pointer;
     transition: var(--transition);
     position: relative;
+    text-align: center;
 }
 
 .btn-submit:hover:not(:disabled) {
