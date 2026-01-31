@@ -74,7 +74,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ===================================
-// Contact Form Submission to Supabase
+// Contact Form Submission to Email (Web3Forms)
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
@@ -82,15 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const successModal = document.getElementById('successModal');
     const modalOkBtn = document.getElementById('modalOkBtn');
 
+    // YOUR ACCESS KEY HERE (Get this from your email)
+    const ACCESS_KEY = "6685099d-f288-4280-9014-f2ced809ea63";
+
     // Modal OK button - close modal and scroll to top
     if (modalOkBtn && successModal) {
         modalOkBtn.addEventListener('click', () => {
             successModal.classList.remove('active');
-            // Scroll to top of page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Also close modal when clicking overlay background
         successModal.addEventListener('click', (e) => {
             if (e.target === successModal) {
                 successModal.classList.remove('active');
@@ -103,56 +104,52 @@ document.addEventListener('DOMContentLoaded', () => {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Get form data
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
 
-            // Validate
             if (!name || !email || !message) {
                 alert('Please fill in all fields');
                 return;
             }
 
-            // Show loading state
             submitBtn.disabled = true;
             submitBtn.classList.add('loading');
 
             try {
-                // Submit to Supabase
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages`, {
-                    method: 'POST',
+                // CHANGED: Sending to Web3Forms API
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Prefer': 'return=minimal'
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
                     },
                     body: JSON.stringify({
+                        access_key: ACCESS_KEY, // Required
                         name: name,
                         email: email,
-                        message: message
-                    })
+                        message: message,
+                        subject: `New Contact from RepSay Website` // Optional Email Subject
+                    }),
                 });
 
-                if (response.ok) {
-                    // Success - show modal
+                const result = await response.json();
+
+                if (result.success) {
+                    // Success
                     submitBtn.classList.remove('loading');
                     submitBtn.disabled = false;
-
-                    // Reset form
                     contactForm.reset();
 
-                    // Show success modal
                     if (successModal) {
                         successModal.classList.add('active');
                     }
                 } else {
-                    throw new Error('Failed to send message');
+                    throw new Error('Failed to send email');
                 }
             } catch (error) {
-                console.error('Error submitting form:', error);
-                alert('Failed to send message. Please try again later.');
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
                 submitBtn.classList.remove('loading');
                 submitBtn.disabled = false;
             }
