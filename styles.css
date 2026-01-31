@@ -565,11 +565,9 @@ img {
     background: var(--color-surface);
 }
 
-.contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 48px;
-    align-items: start;
+.contact-form-container {
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .contact-info {
